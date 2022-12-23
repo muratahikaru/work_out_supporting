@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Work Out Supporting</string>
+	<string>Muscle Training Support</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>work_out_supporting</string>
+	<string>camera_estimate</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -47,7 +47,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<key>NSPhotoLibraryUsageDescription</key>
-    <string>This app requires to access your photo library</string>
+	<key>NSCameraUsageDescription</key>
+    <string>Access to take a photo by camera</string>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>Access to pick a photo</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Access to pick a photo</string>
 </dict>
 </plist>
