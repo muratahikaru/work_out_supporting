@@ -5,19 +5,6 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import './keypoints.dart';
 import './predictor.dart';
 
-// class CameraApp extends StatelessWidget {
-//   const CameraApp({Key? key}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     var title = 'Squat Deeply';
-//     return MaterialApp(
-//       title: title,
-//       home: SquatCamPage(title: title, cameras: cams),
-//     );
-//   }
-// }
-
 class SquatCamPage extends StatefulWidget {
   final String title;
   final List<CameraDescription> cameras;

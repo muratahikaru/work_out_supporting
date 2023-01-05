@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'package:camera/camera.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import './keypoints.dart';
-import './predictor.dart';
 import 'select_event.dart';
 
 List<CameraDescription> cams = [];
