@@ -89,6 +89,10 @@ class KeyPoints {
     }
     return (hip - knee).angleTo(ankle - knee);
   }
+
+  double? get rightShoulder {
+
+  }
 }
 
 const _bufferSize = 30;
@@ -135,6 +139,7 @@ class KeyPointsSeries {
   }
 
   double get kneeAngleSpeed {
+    // kneeとankle,kneeとhipの角度の変化
     // radian / sec
     if (kneeAngles.length < 2) {
       return 0;
@@ -161,6 +166,7 @@ class KeyPointsSeries {
   }
 
   bool get isUnderParallel {
+    // radian
     return kneeAngles.first < (pi * 10 / 18);
   }
 }
