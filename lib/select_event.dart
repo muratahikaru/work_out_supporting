@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'camera_page.dart';
+import 'squat_camera_page.dart';
+import 'dumbbell_fly_camera_page.dart';
 
 class SelectEvent extends StatelessWidget {
   final List<CameraDescription> cameras;
@@ -25,6 +26,15 @@ class SelectEvent extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => (SquatCamPage(title: 'スクワット', cameras: cameras,))),
+                );
+              },
+            ),
+            ElevatedButton(
+              child: const Text("ダンベルフライ"),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => (DumbbellFlyCamPage(title: 'ダンベルフライ', cameras: cameras,))),
                 );
               },
             )
