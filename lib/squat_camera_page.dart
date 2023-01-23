@@ -19,7 +19,7 @@ class SquatCamPage extends StatefulWidget {
 class _SquatCamPageState extends State<SquatCamPage> {
   final Predictor _predictor = Predictor();
   int _count = 0;
-  KeyPointsSeries _keyPoints = const KeyPointsSeries.init();
+  SquatKeyPointsSeries _keyPoints = const SquatKeyPointsSeries.init();
 
   int _currentCam = 0;
   CameraController? _cameraController;
@@ -152,7 +152,7 @@ class _SquatCamPageState extends State<SquatCamPage> {
       _playing = true;
       _cntMutex = false;
       _shallowAlert = Container();
-      _keyPoints = const KeyPointsSeries.init();
+      _keyPoints = const SquatKeyPointsSeries.init();
     });
     await _cameraController!.startImageStream((image) async {
       if (!_predictor.ready) return;
@@ -291,7 +291,7 @@ class _KeyPointsPreview extends StatelessWidget {
 }
 
 class _SquatChart extends StatelessWidget {
-  final KeyPointsSeries data;
+  final SquatKeyPointsSeries data;
   const _SquatChart(this.data, {Key? key}) : super(key: key);
 
   @override

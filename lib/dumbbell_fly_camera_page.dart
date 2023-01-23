@@ -18,7 +18,7 @@ class DumbbellFlyCamPage extends StatefulWidget {
 class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
   final Predictor _predictor = Predictor();
   int _count = 0;
-  KeyPointsSeries _keyPoints = const KeyPointsSeries.init();
+  DumbbellFlyKeyPointsSeries _keyPoints = const DumbbellFlyKeyPointsSeries.init();
 
   int _currentCam = 0;
   CameraController? _cameraController;
@@ -70,7 +70,7 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
         final msgs = [
           _keyPoints.keyPoints.first.score.toStringAsFixed(3),
           _frameRate.toStringAsFixed(3) + "fps",
-          _keyPoints.kneeAngleSpeed.toStringAsFixed(3),
+          // _keyPoints.kneeAngleSpeed.toStringAsFixed(3),
         ];
         previewStack.add(Container(
           color: Colors.white.withOpacity(0.3),
@@ -155,7 +155,7 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
       _playing = true;
       _cntMutex = false;
       _shallowAlert = Container();
-      _keyPoints = const KeyPointsSeries.init();
+      _keyPoints = const DumbbellFlyKeyPointsSeries.init();
     });
 
     await _cameraController!.startImageStream((image) async {
@@ -164,6 +164,22 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
       if(res != null && res.keyPoints.score > 0.5) {
         _frameRate = 1000 / res.duration.inMilliseconds.toDouble();
         _keyPoints = _keyPoints.push(res.timestamp, res.keyPoints);
+
+        if(!_cntMutex && _keyPoints.isUnderParallel) {
+          if (_keyPoints.isObtuseAngle) {
+            _cntMutex = true;
+            _count += 1;
+            var msg = _count.toString();
+            _shallowAlert = Text(msg,
+                style: const TextStyle(color: Colors.redAccent, fontSize: 90, fontWeight: FontWeight.w800));
+            Timer(const Duration(seconds: 2), () {
+              setState(() {
+                _cntMutex = false;
+                _shallowAlert = Container();
+              });
+            });
+          }
+        }
       }
 
       if(mounted) setState((){});

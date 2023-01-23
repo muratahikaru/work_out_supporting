@@ -70,6 +70,14 @@ class KeyPoints {
 
   Vector2? get leftHip => _points[KeyPointPart.leftHip]?.vec;
 
+  // ダンベルフライ部位
+  Vector2? get rightShoulder => _points[KeyPointPart.rightShoulder]?.vec;
+  Vector2? get leftShoulder => _points[KeyPointPart.leftShoulder]?.vec;
+  Vector2? get rightElbow => _points[KeyPointPart.rightElbow]?.vec;
+  Vector2? get leftElbow => _points[KeyPointPart.leftElbow]?.vec;
+  Vector2? get rightWrist => _points[KeyPointPart.rightWrist]?.vec;
+  Vector2? get leftWrist => _points[KeyPointPart.leftWrist]?.vec;
+
   double? get leftKneeAngle {
     final hip = _points[KeyPointPart.leftHip]?.vec;
     final knee = _points[KeyPointPart.leftKnee]?.vec;
@@ -90,26 +98,70 @@ class KeyPoints {
     return (hip - knee).angleTo(ankle - knee);
   }
 
-  double? get rightShoulder {
+  // ダンベルフライ部位角度
+  double? get leftElbowAngle {
+    final shoulder = _points[KeyPointPart.leftShoulder]?.vec;
+    final elbow = _points[KeyPointPart.leftElbow]?.vec;
+    final wrist = _points[KeyPointPart.leftWrist]?.vec;
 
+    if(shoulder == null || elbow == null || wrist == null) {
+      return null;
+    }
+    return (shoulder - elbow).angleTo(wrist - elbow);
   }
+
+  double? get rightElbowAngle {
+    final shoulder = _points[KeyPointPart.rightShoulder]?.vec;
+    final elbow = _points[KeyPointPart.rightElbow]?.vec;
+    final wrist = _points[KeyPointPart.rightWrist]?.vec;
+
+    if(shoulder == null || elbow == null || wrist == null) {
+      return null;
+    }
+    return (shoulder - elbow).angleTo(wrist - elbow);
+  }
+
+  double? get leftShoulderToWristAngle {
+    final wrist = _points[KeyPointPart.leftWrist]?.vec;
+    final leftShoulder = _points[KeyPointPart.leftShoulder]?.vec;
+    final rightShoulder = _points[KeyPointPart.rightShoulder]?.vec;
+
+    if (wrist == null || leftShoulder == null || rightShoulder == null) {
+      return null;
+    }
+
+    return (wrist - leftShoulder).angleTo(rightShoulder - leftShoulder);
+  }
+
+  double? get rightShoulderToWristAngle {
+    final wrist = _points[KeyPointPart.rightWrist]?.vec;
+    final rightShoulder = _points[KeyPointPart.rightShoulder]?.vec;
+    final leftShoulder = _points[KeyPointPart.leftShoulder]?.vec;
+
+    if (wrist == null || rightShoulder == null || leftShoulder == null) {
+      return null;
+    }
+
+    return (wrist - rightShoulder).angleTo(leftShoulder - rightShoulder);
+  }
+
 }
 
 const _bufferSize = 30;
 
-class KeyPointsSeries {
+class SquatKeyPointsSeries {
   final List<DateTime> timestamps;
   final List<KeyPoints> keyPoints;
   final List<double> kneeAngles;
 
-  const KeyPointsSeries(this.timestamps, this.keyPoints, this.kneeAngles);
+  const SquatKeyPointsSeries(this.timestamps, this.keyPoints, this.kneeAngles);
 
-  const KeyPointsSeries.init()
+  const SquatKeyPointsSeries.init()
       : timestamps = const [],
         keyPoints = const [],
         kneeAngles = const [];
 
-  KeyPointsSeries push(DateTime timestamp, KeyPoints kp) {
+  SquatKeyPointsSeries push(DateTime timestamp, KeyPoints kp) {
     if (kp.leftHip == null || kp.leftKneeAngle == null) {
       return this;
     }
@@ -117,7 +169,7 @@ class KeyPointsSeries {
     final timestamps = [timestamp, ...this.timestamps];
     final keyPoints = [kp, ...this.keyPoints];
     if (keyPoints.length == 1) {
-      return KeyPointsSeries(timestamps, keyPoints, [kp.leftKneeAngle!]);
+      return SquatKeyPointsSeries(timestamps, keyPoints, [kp.leftKneeAngle!]);
     }
 
     const k = 0.7;
@@ -125,7 +177,7 @@ class KeyPointsSeries {
       this.kneeAngles.first * (1 - k) + kp.leftKneeAngle! * k,
       ...this.kneeAngles,
     ];
-    return KeyPointsSeries(
+    return SquatKeyPointsSeries(
       timestamps.length > _bufferSize
           ? timestamps.sublist(0, _bufferSize - 1)
           : timestamps,
@@ -162,6 +214,8 @@ class KeyPointsSeries {
   }
 
   bool get isStanding {
+    // ログ
+    log(kneeAngleSpeed);
     return kneeAngleSpeed > 2.0;
   }
 
@@ -169,4 +223,114 @@ class KeyPointsSeries {
     // radian
     return kneeAngles.first < (pi * 10 / 18);
   }
+}
+
+class DumbbellFlyKeyPointsSeries {
+  final List<DateTime> timestamps;
+  final List<KeyPoints> keyPoints;
+  final List<double> rightElbowAngles;
+  final List<double> leftElbowAngles;
+  final List<double> rightShoulderToWristAngles;
+  final List<double> leftShoulderToWristAngles;
+
+  const DumbbellFlyKeyPointsSeries(this.timestamps, this.keyPoints, this.rightElbowAngles, this.leftElbowAngles, this.rightShoulderToWristAngles, this.leftShoulderToWristAngles);
+
+  const DumbbellFlyKeyPointsSeries.init()
+    : timestamps = const [],
+      keyPoints = const [],
+      rightElbowAngles = const [],
+      leftElbowAngles = const [],
+      rightShoulderToWristAngles = const [],
+      leftShoulderToWristAngles = const [];
+
+  DumbbellFlyKeyPointsSeries push(DateTime timestamp, KeyPoints kp) {
+    if (kp.rightShoulder == null ||
+        kp.leftShoulder == null ||
+        kp.rightElbow == null ||
+        kp.leftElbow == null ||
+        kp.rightWrist == null ||
+        kp.leftWrist == null
+    ) {
+      return this;
+    }
+
+    final timestamps = [timestamp, ...this.timestamps];
+    final keyPoints = [kp, ...this.keyPoints];
+
+    if (keyPoints.length == 1) {
+      return DumbbellFlyKeyPointsSeries(timestamps, keyPoints, [kp.rightElbowAngle!], [kp.leftElbowAngle!], [kp.rightShoulderToWristAngle!], [kp.leftShoulderToWristAngle!]);
+    }
+
+    // 移動平均
+    const k = 0.7;
+    final rightElbowAngles = [
+      this.rightElbowAngles.first * (1 - k) + kp.rightElbowAngle! * k,
+      ...this.rightElbowAngles,
+    ];
+    final leftElbowAngles = [
+      this.leftElbowAngles.first * (1 - k) + kp.leftElbowAngle! * k,
+      ...this.leftElbowAngles,
+    ];
+    final rightShoulderToWristAngles = [
+      this.rightShoulderToWristAngles.first * (1 - k) + kp.rightShoulderToWristAngle! * k,
+      ...this.rightShoulderToWristAngles,
+    ];
+    final leftShoulderToWristAngles = [
+      this.leftShoulderToWristAngles.first * (1 - k) + kp.leftShoulderToWristAngle! * k,
+      ...this.leftShoulderToWristAngles,
+    ];
+
+    return DumbbellFlyKeyPointsSeries(
+      timestamps.length > _bufferSize
+          ? timestamps.sublist(0, _bufferSize - 1)
+          : timestamps,
+      keyPoints.length > _bufferSize
+          ? keyPoints.sublist(0, _bufferSize - 1)
+          : keyPoints,
+      rightElbowAngles.length > _bufferSize
+          ? rightElbowAngles.sublist(0, _bufferSize - 1)
+          : rightElbowAngles,
+      leftElbowAngles.length > _bufferSize
+          ? leftElbowAngles.sublist(0, _bufferSize - 1)
+          : leftElbowAngles,
+      rightShoulderToWristAngles.length > _bufferSize
+          ? rightShoulderToWristAngles.sublist(0, _bufferSize - 1)
+          :rightShoulderToWristAngles,
+      leftShoulderToWristAngles.length > _bufferSize
+          ? leftShoulderToWristAngles.sublist(0, _bufferSize - 1)
+          : leftShoulderToWristAngles
+    );
+  }
+
+  double get rightShoulderToWristAngleSpeed {
+    if (rightShoulderToWristAngles.length < 2) {
+      return 0;
+    }
+    final dt = timestamps[0].difference(timestamps[1]);
+    return (rightShoulderToWristAngles[0] - rightShoulderToWristAngles[1]) /
+        (dt.inMicroseconds.toDouble() / 1000000);
+  }
+
+  double get leftShoulderToWristAngleSpeed {
+    if (leftShoulderToWristAngles.length < 2) {
+      return 0;
+    }
+    final dt = timestamps[0].difference(timestamps[1]);
+    return (leftShoulderToWristAngles[0] - leftShoulderToWristAngles[1]) /
+        (dt.inMicroseconds.toDouble() / 1000000);
+  }
+
+  bool get isStartPosition {
+    return rightShoulderToWristAngleSpeed > 2.0 && leftShoulderToWristAngleSpeed > 2.0;
+  }
+
+  bool get isObtuseAngle {
+    return (rightElbowAngles.first > (pi * 10 / 18) ) && (leftShoulderToWristAngles.first > (pi * 10 / 18));
+  }
+
+  bool get isUnderParallel {
+    return (rightShoulderToWristAngles.first > (pi * 10 * 1.5 / 18)) && (leftShoulderToWristAngles.first > (pi * 10 * 1.5 / 18));
+  }
+
+
 }
