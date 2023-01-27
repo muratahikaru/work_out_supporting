@@ -168,8 +168,10 @@ class _SquatCamPageState extends State<SquatCamPage> {
             _count += 1;
             msg = _count.toString();
           }
-          _shallowAlert = Text(msg,
-              style: const TextStyle(color: Colors.redAccent, fontSize: 90, fontWeight: FontWeight.w800));
+          _shallowAlert = Text(
+                                msg,
+                                style: const TextStyle(color: Colors.redAccent, fontSize: 90, fontWeight: FontWeight.w800)
+                              );
           Timer(const Duration(seconds: 2), () {
             setState(() {
               _cntMutex = false;

@@ -214,13 +214,12 @@ class SquatKeyPointsSeries {
   }
 
   bool get isStanding {
-    // ログ
-    log(kneeAngleSpeed);
     return kneeAngleSpeed > 2.0;
   }
 
   bool get isUnderParallel {
     // radian
+    // 1.74444 → 約100度
     return kneeAngles.first < (pi * 10 / 18);
   }
 }
@@ -321,16 +320,18 @@ class DumbbellFlyKeyPointsSeries {
   }
 
   bool get isStartPosition {
-    return rightShoulderToWristAngleSpeed > 2.0 && leftShoulderToWristAngleSpeed > 2.0;
+    //125度より小さい
+    return (rightShoulderToWristAngles.first < 2.182) && (leftShoulderToWristAngles.first < 2.186);
   }
 
   bool get isObtuseAngle {
-    return (rightElbowAngles.first > (pi * 10 / 18) ) && (leftShoulderToWristAngles.first > (pi * 10 / 18));
+    // 100度以上120度以下
+    return (rightElbowAngles.first >= 1.745 ) && (rightShoulderToWristAngles.first <= 2.094) && (leftShoulderToWristAngles.first >= 1.745) &&  (leftShoulderToWristAngles.first <= 2.094);
   }
 
   bool get isUnderParallel {
-    return (rightShoulderToWristAngles.first > (pi * 10 * 1.5 / 18)) && (leftShoulderToWristAngles.first > (pi * 10 * 1.5 / 18));
+    // 175度より大きい
+    return (rightShoulderToWristAngles.first > 3.054) && (leftShoulderToWristAngles.first > 3.054);
   }
-
 
 }
