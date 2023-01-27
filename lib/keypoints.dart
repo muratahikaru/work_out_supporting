@@ -326,12 +326,12 @@ class DumbbellFlyKeyPointsSeries {
 
   bool get isObtuseAngle {
     // 100度以上120度以下
-    return (rightElbowAngles.first >= 1.745 ) && (rightShoulderToWristAngles.first <= 2.094) && (leftShoulderToWristAngles.first >= 1.745) &&  (leftShoulderToWristAngles.first <= 2.094);
+    return (rightElbowAngles.first > 1.745 ) && (rightElbowAngles.first < 2.5) && (leftElbowAngles.first > 1.745) &&  (leftElbowAngles.first < 2.5);
   }
 
   bool get isUnderParallel {
     // 175度より大きい
-    return (rightShoulderToWristAngles.first > 3.054) && (leftShoulderToWristAngles.first > 3.054);
+    return (rightShoulderToWristAngles.first > 2.9) && (leftShoulderToWristAngles.first > 2.9);
   }
 
 }

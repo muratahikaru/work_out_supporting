@@ -70,8 +70,15 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
         final msgs = [
           _keyPoints.keyPoints.first.score.toStringAsFixed(3),
           _frameRate.toStringAsFixed(3) + "fps",
-          _keyPoints.rightShoulderToWristAngleSpeed.toStringAsFixed(3),
-          _keyPoints.leftShoulderToWristAngleSpeed.toStringAsFixed(3),
+          "rightAngleSpeed:" + _keyPoints.rightShoulderToWristAngleSpeed.toStringAsFixed(3),
+          "leftAngleSpeed:" + _keyPoints.leftShoulderToWristAngleSpeed.toStringAsFixed(3),
+          "rightAngleShouler:" + _keyPoints.rightShoulderToWristAngles.first.toStringAsFixed(3),
+          "lefttAngleShoulder:" + _keyPoints.leftShoulderToWristAngles.first.toStringAsFixed(3),
+          "rightAngleElbow:" + _keyPoints.rightElbowAngles.first.toStringAsFixed(3),
+          "leftAngleElbow:" + _keyPoints.leftElbowAngles.first.toStringAsFixed(3),
+          'cntMutex:' + _cntMutex.toString(),
+          'parallell:' + _keyPoints.isUnderParallel.toString(),
+          'obtuse:' + _keyPoints.isObtuseAngle.toString(),
         ];
         previewStack.add(Container(
           color: Colors.white.withOpacity(0.3),
