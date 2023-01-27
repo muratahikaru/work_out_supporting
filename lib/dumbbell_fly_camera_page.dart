@@ -171,6 +171,7 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
             _under = true;
             if (_under && _keyPoints.isStartPosition) {
               _cntMutex = true;
+              _under = false;
               _count += 1;
               var msg = _count.toString();
               _shallowAlert = Text(msg,
