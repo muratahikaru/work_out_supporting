@@ -27,7 +27,6 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
   double _frameRate = 0;
 
   bool _cntMutex = false;
-  bool _under = false;
   Widget _shallowAlert = Container();
 
   @override
@@ -71,7 +70,8 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
         final msgs = [
           _keyPoints.keyPoints.first.score.toStringAsFixed(3),
           _frameRate.toStringAsFixed(3) + "fps",
-          // _keyPoints.kneeAngleSpeed.toStringAsFixed(3),
+          _keyPoints.rightShoulderToWristAngleSpeed.toStringAsFixed(3),
+          _keyPoints.leftShoulderToWristAngleSpeed.toStringAsFixed(3),
         ];
         previewStack.add(Container(
           color: Colors.white.withOpacity(0.3),
@@ -166,24 +166,19 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
         _frameRate = 1000 / res.duration.inMilliseconds.toDouble();
         _keyPoints = _keyPoints.push(res.timestamp, res.keyPoints);
 
-        if(!_cntMutex && _keyPoints.isUnderParallel && !_under) {
+        if(!_cntMutex && _keyPoints.isUnderParallel) {
           if (_keyPoints.isObtuseAngle) {
-            _under = true;
-            if (_under && _keyPoints.isStartPosition) {
-              _cntMutex = true;
-              _under = false;
-              _count += 1;
-              var msg = _count.toString();
-              _shallowAlert = Text(msg,
-                  style: const TextStyle(color: Colors.redAccent, fontSize: 90, fontWeight: FontWeight.w800));
-              Timer(const Duration(seconds: 2), () {
-                setState(() {
-                  _cntMutex = false;
-                  _under = false;
-                  _shallowAlert = Container();
-                });
+            _cntMutex = true;
+            _count += 1;
+            var msg = _count.toString();
+            _shallowAlert = Text(msg,
+                style: const TextStyle(color: Colors.redAccent, fontSize: 90, fontWeight: FontWeight.w800));
+            Timer(const Duration(seconds: 2), () {
+              setState(() {
+                _cntMutex = false;
+                _shallowAlert = Container();
               });
-            }
+            });
           }
         }
       }
