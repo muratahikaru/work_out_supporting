@@ -27,6 +27,7 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
   double _frameRate = 0;
 
   bool _cntMutex = false;
+  bool _isUnder = false;
   Widget _shallowAlert = Container();
 
   @override
@@ -173,20 +174,28 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
         _frameRate = 1000 / res.duration.inMilliseconds.toDouble();
         _keyPoints = _keyPoints.push(res.timestamp, res.keyPoints);
 
+        // 下ろしたかどうかを記録
         if(!_cntMutex && _keyPoints.isUnderParallel) {
           if (_keyPoints.isObtuseAngle) {
-            _cntMutex = true;
-            _count += 1;
-            var msg = _count.toString();
-            _shallowAlert = Text(msg,
-                style: const TextStyle(color: Colors.redAccent, fontSize: 90, fontWeight: FontWeight.w800));
-            Timer(const Duration(seconds: 2), () {
-              setState(() {
-                _cntMutex = false;
-                _shallowAlert = Container();
-              });
-            });
+            _isUnder = true;
           }
+        }
+
+        // 下ろした履歴があり、スタートポジションまで戻したらカウント
+        // cntMutexはカウントが高速でカウントが無限に行われないように制御
+        if (_isUnder && !_cntMutex && _keyPoints.isStartPosition) {
+          _cntMutex = true;
+          _count += 1;
+          var msg = _count.toString();
+          _shallowAlert = Text(msg,
+              style: const TextStyle(color: Colors.redAccent, fontSize: 90, fontWeight: FontWeight.w800));
+          Timer(const Duration(seconds: 2), () {
+            setState(() {
+              _cntMutex = false;
+              _isUnder = false;
+              _shallowAlert = Container();
+            });
+          });
         }
       }
 
