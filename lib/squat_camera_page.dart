@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:intl/intl.dart';
 import './keypoints.dart';
 import './predictor.dart';
+import './database_helper.dart';
+
 
 class SquatCamPage extends StatefulWidget {
   final String title;
@@ -21,6 +24,7 @@ class _SquatCamPageState extends State<SquatCamPage> {
   int _count = 0;
   SquatKeyPointsSeries _keyPoints = const SquatKeyPointsSeries.init();
 
+  final dbHelper = DatabaseHelper.instance;
   int _currentCam = 0;
   CameraController? _cameraController;
 
@@ -142,6 +146,12 @@ class _SquatCamPageState extends State<SquatCamPage> {
       _cameraController?.stopImageStream();
       _playing = false;
     });
+    showDialog<void>(
+        context: context,
+        builder: (_) {
+          return AlertDialogSample(count: _count, dbHelper: dbHelper);
+        }
+    );
   }
 
   void _onPlay() async {
@@ -153,6 +163,7 @@ class _SquatCamPageState extends State<SquatCamPage> {
       _cntMutex = false;
       _shallowAlert = Container();
       _keyPoints = const SquatKeyPointsSeries.init();
+      _count = 0;
     });
     await _cameraController!.startImageStream((image) async {
       if (!_predictor.ready) return;
@@ -292,25 +303,66 @@ class _KeyPointsPreview extends StatelessWidget {
   );
 }
 
-class _SquatChart extends StatelessWidget {
-  final SquatKeyPointsSeries data;
-  const _SquatChart(this.data, {Key? key}) : super(key: key);
+class AlertDialogSample extends StatelessWidget {
+  final int count;
+  final DatabaseHelper dbHelper;
+  const AlertDialogSample({Key? key, required this.count, required this.dbHelper}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return charts.TimeSeriesChart([
-      charts.Series<double, DateTime>(
-        id: 'KneeAngle',
-        data: data.kneeAngles,
-        domainFn: (_, i) => data.timestamps[i!],
-        measureFn: (d, _) => d,
-      ),
-      charts.Series<double, DateTime>(
-        id: 'KneeAngleSpeed',
-        data: data.kneeAngleSpeeds,
-        domainFn: (_, i) => data.timestamps[i!],
-        measureFn: (d, _) => d,
-      ),
-    ]);
+    return AlertDialog(
+      title: Text('結果'),
+      content: Text('今回の結果は$countです。保存しますか？'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context, 'Cancel'),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          // onPressed: () => _insert(count, context),
+          onPressed: () => _insert(count, context),
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
+  void _insert(int count, BuildContext context) async {
+
+    DateTime now = DateTime.now();
+    DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+    String date = outputFormat.format(now);
+
+    // row to insert
+    Map<String, dynamic> row = {
+      DatabaseHelper.columnDate : date,
+      DatabaseHelper.columnTraining : 'スクワット',
+      DatabaseHelper.columnNumberOfTimes : count,
+    };
+    final id = await dbHelper.insert(row);
+
+    showDialog<void>(
+        context: context,
+        builder: (_) {
+          return const CompletionDialogSample();
+        }
+    );
+  }
+}
+
+class CompletionDialogSample extends StatelessWidget {
+  const CompletionDialogSample({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('ダイアログ'),
+      content: const Text('保存しました'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context, 'OK'),
+          child: const Text('OK'),
+        ),
+      ],
+    );
   }
 }
