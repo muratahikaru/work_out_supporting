@@ -311,7 +311,7 @@ class AlertDialogSample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('結果'),
+      title: const Text('結果'),
       content: Text('今回の結果は$countです。保存しますか？'),
       actions: <Widget>[
         TextButton(
@@ -319,8 +319,10 @@ class AlertDialogSample extends StatelessWidget {
           child: const Text('Cancel'),
         ),
         TextButton(
-          // onPressed: () => _insert(count, context),
-          onPressed: () => _insert(count, context),
+          onPressed: () => {
+            Navigator.pop(context),
+            _insert(count, context),
+          },
           child: const Text('OK'),
         ),
       ],
@@ -355,7 +357,7 @@ class CompletionDialogSample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('ダイアログ'),
+      title: const Text('完了メッセージ'),
       content: const Text('保存しました'),
       actions: <Widget>[
         TextButton(
