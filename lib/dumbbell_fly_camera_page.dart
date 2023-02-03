@@ -2,7 +2,10 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import './keypoints.dart';
+import 'package:intl/intl.dart';
 import './predictor.dart';
+import './database_helper.dart';
+import './main.dart';
 
 class DumbbellFlyCamPage extends StatefulWidget {
   final String title;
@@ -18,6 +21,8 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
   final Predictor _predictor = Predictor();
   int _count = 0;
   DumbbellFlyKeyPointsSeries _keyPoints = const DumbbellFlyKeyPointsSeries.init();
+
+  final dbHelper = DatabaseHelper.instance;
 
   int _currentCam = 0;
   CameraController? _cameraController;
@@ -152,6 +157,12 @@ class _DumbbellFlyCamPageState extends State<DumbbellFlyCamPage> {
       _cameraController?.stopImageStream();
       _playing = false;
     });
+    showDialog<void>(
+        context: context,
+        builder: (_) {
+          return AlertDialogSample(count: _count, dbHelper: dbHelper);
+        }
+    );
   }
 
   void _onPlay() async {
@@ -317,6 +328,75 @@ class _KeyPointsPreview extends StatelessWidget {
       ).toList(),
     )
   );
+}
+
+class AlertDialogSample extends StatelessWidget {
+  final int count;
+  final DatabaseHelper dbHelper;
+  const AlertDialogSample({Key? key, required this.count, required this.dbHelper}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('結果'),
+      content: Text('今回の結果は$countです。保存しますか？'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context, 'Cancel'),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => {
+            Navigator.pop(context),
+            _insert(count, context),
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
+  void _insert(int count, BuildContext context) async {
+
+    DateTime now = DateTime.now();
+    DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+    String date = outputFormat.format(now);
+
+    // row to insert
+    Map<String, dynamic> row = {
+      DatabaseHelper.columnDate : date,
+      DatabaseHelper.columnTraining : 'ダンベルフライ',
+      DatabaseHelper.columnCount : count,
+    };
+    final id = await dbHelper.insert(row);
+
+    showDialog<void>(
+        context: context,
+        builder: (_) {
+          return const CompletionDialogSample();
+        }
+    );
+  }
+}
+
+class CompletionDialogSample extends StatelessWidget {
+  const CompletionDialogSample({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('完了メッセージ'),
+      content: const Text('保存しました'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const MyHomePage(title: "Workout Supporting"))
+          ),
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
 }
 
 

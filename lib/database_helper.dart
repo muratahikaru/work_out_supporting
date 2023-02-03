@@ -13,7 +13,7 @@ class DatabaseHelper {
   static final columnId = "_id";
   static final columnDate = "date";
   static final columnTraining = "training";
-  static final columnNumberOfTimes = "number_of_times";
+  static final columnCount = "count";
 
   DatabaseHelper._privateConstructor();
 
@@ -46,7 +46,7 @@ class DatabaseHelper {
           $columnId INTEGER PRIMARY KEY,
           $columnDate TEXT NOT NULL,
           $columnTraining TEXT NOT NULL,
-          $columnNumberOfTimes INTEGER NOT NULL
+          $columnCount INTEGER NOT NULL
         )
       '''
     );
@@ -63,6 +63,15 @@ class DatabaseHelper {
       table,
       where: "date = ?",
       whereArgs: [date],
+    );
+  }
+
+  Future<void> delete(int id) async {
+    Database? db = await instance.database;
+    await db!.delete(
+      table,
+      where: "_id = ?",
+      whereArgs: [id],
     );
   }
 

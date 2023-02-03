@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import './keypoints.dart';
 import './predictor.dart';
 import './database_helper.dart';
+import './main.dart';
 
 
 class SquatCamPage extends StatefulWidget {
@@ -339,7 +340,7 @@ class AlertDialogSample extends StatelessWidget {
     Map<String, dynamic> row = {
       DatabaseHelper.columnDate : date,
       DatabaseHelper.columnTraining : 'スクワット',
-      DatabaseHelper.columnNumberOfTimes : count,
+      DatabaseHelper.columnCount : count,
     };
     final id = await dbHelper.insert(row);
 
@@ -361,7 +362,10 @@ class CompletionDialogSample extends StatelessWidget {
       content: const Text('保存しました'),
       actions: <Widget>[
         TextButton(
-          onPressed: () => Navigator.pop(context, 'OK'),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MyHomePage(title: "Workout Supporting"))
+          ),
           child: const Text('OK'),
         ),
       ],
